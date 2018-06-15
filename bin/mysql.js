@@ -199,6 +199,39 @@ let livesList = function (  ) {
   return query( _sql)
 }
 
+//查询新闻页列表
+let newsList = function (  ) {
+  let _sql = `
+    SELECT * FROM tb_newslist
+      `
+  return query( _sql)
+}
+
+//查询新闻页列表某一个
+let newsList_one = function ( news_id ) {
+  let _sql = `
+    SELECT * FROM tb_newslist  where news_id="${news_id}"
+      `
+  return query( _sql)
+}
+
+
+//通过新闻页列表查询新闻详情
+let newsList_detail = function ( news_id ) {
+  let _sql = `
+    SELECT * FROM tb_newslist_detail where news_id="${news_id}"
+      `
+  return query( _sql)
+}
+
+//查询视频页列表
+let vedioesList = function (  ) {
+  let _sql = `
+    SELECT * FROM tb_vedioeslist
+      `
+  return query( _sql)
+}
+
 
 
 
@@ -224,5 +257,9 @@ module.exports={
   registerUser,
   loginUser,
   notice,
-  livesList
+  livesList,
+  newsList,
+  newsList_one,
+  vedioesList,
+  newsList_detail
 }

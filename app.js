@@ -13,6 +13,8 @@ const index = require('./routes/login')
 const users = require('./routes/register')
 const notice = require('./routes/notice')
 const livesList = require('./routes/livesList')
+const newsList = require('./routes/newsList')
+const vedioesList = require('./routes/vedioesList')
 
 // error handler
 onerror(app)
@@ -58,6 +60,8 @@ app.use(index.routes(), index.allowedMethods())
 app.use(users.routes(), users.allowedMethods())
 app.use(notice.routes(), notice.allowedMethods())
 app.use(livesList.routes(), livesList.allowedMethods())
+app.use(newsList.routes(), newsList.allowedMethods())
+app.use(vedioesList.routes(), vedioesList.allowedMethods())
 
 // error-handling
 app.on('error', (err, ctx) => {
