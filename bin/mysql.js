@@ -199,6 +199,14 @@ let livesList = function (  ) {
   return query( _sql)
 }
 
+//查询直播页列表前四个
+let livesListFour = function (  ) {
+  let _sql = `
+    SELECT * FROM tb_livesList limit 0,4
+      `
+  return query( _sql)
+}
+
 //查询新闻页列表
 let newsList = function (  ) {
   let _sql = `
@@ -207,10 +215,10 @@ let newsList = function (  ) {
   return query( _sql)
 }
 
-//查询新闻页列表某一个
-let newsList_one = function ( news_id ) {
+//查询新闻页列表前四个
+let newsListFour = function (  ) {
   let _sql = `
-    SELECT * FROM tb_newslist  where news_id="${news_id}"
+    SELECT * FROM tb_newslist limit 0,4
       `
   return query( _sql)
 }
@@ -218,9 +226,13 @@ let newsList_one = function ( news_id ) {
 
 //通过新闻页列表查询新闻详情
 let newsList_detail = function ( news_id ) {
+  console.log(news_id)
   let _sql = `
-    SELECT * FROM tb_newslist_detail where news_id="${news_id}"
+    SELECT tb_newslist.author, tb_newslist.image, tb_newslist.title,tb_newslist.headImage,tb_newslist.time,tb_newslist.content,tb_comment.comment_content,tb_users.name,tb_users.userImg,tb_reply.reply_content
+      FROM tb_newslist, tb_comment,tb_users,tb_reply
+    WHERE tb_newslist.news_id = "${news_id}" and tb_newslist.news_id = tb_comment.topic_id and tb_newslist.topic_type = tb_comment.topic_type and tb_comment.user_id = tb_users.id and tb_reply.comment_id = tb_comment.id
       `
+  console.log( query( _sql))
   return query( _sql)
 }
 
@@ -228,6 +240,13 @@ let newsList_detail = function ( news_id ) {
 let vedioesList = function (  ) {
   let _sql = `
     SELECT * FROM tb_vedioeslist
+      `
+  return query( _sql)
+}
+//查询视频页列表前四个
+let vedioesListFour = function (  ) {
+  let _sql = `
+    SELECT * FROM tb_vedioeslist limit 0,4
       `
   return query( _sql)
 }
@@ -259,7 +278,9 @@ module.exports={
   notice,
   livesList,
   newsList,
-  newsList_one,
   vedioesList,
-  newsList_detail
+  newsList_detail,
+  livesListFour,
+  newsListFour,
+  vedioesListFour
 }
