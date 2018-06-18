@@ -9,9 +9,9 @@ const logger = require('koa-logger')
 // 下面以koa2-cors为例，
 const cors = require('koa2-cors');
 
-const index = require('./routes/login')
+const login = require('./routes/login')
 const users = require('./routes/register')
-const notice = require('./routes/notice')
+const index = require('./routes/index')
 const livesList = require('./routes/livesList')
 const newsList = require('./routes/newsList')
 const vedioesList = require('./routes/vedioesList')
@@ -56,9 +56,9 @@ app.use(async (ctx, next) => {
 })
 
 // routes
-app.use(index.routes(), index.allowedMethods())
+app.use(login.routes(), login.allowedMethods())
 app.use(users.routes(), users.allowedMethods())
-app.use(notice.routes(), notice.allowedMethods())
+app.use(index.routes(), index.allowedMethods())
 app.use(livesList.routes(), livesList.allowedMethods())
 app.use(newsList.routes(), newsList.allowedMethods())
 app.use(vedioesList.routes(), vedioesList.allowedMethods())
