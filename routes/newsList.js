@@ -19,7 +19,6 @@ router.post('/newsList_detail', async (ctx, next) => {
   var news_id={
     news_id:ctx.request.body.news_id
   }
-  console.log(news_id)
   await userModel.newsList_detail(news_id.news_id)
     .then(result=>{
         console.log(result)
@@ -28,11 +27,24 @@ router.post('/newsList_detail', async (ctx, next) => {
             time = time.getFullYear()+'-'+time.getMonth()+'-'+time.getDay()+' '+time.getHours()+':'+time.getMinutes()
             let new_comments = []
             for(let i = 0;i<result.length;i++){
-              new_comments.push({
-                  comment_content:result[i].comment_content,
-                  comment_user:result[i].name,
-                  comment_userImg:result[i].userImg
-              })
+              let new_replys = []
+              for(let j = i;j<result.length;j++){
+                if(result[i].comment_id == result[j].reply_comment_id){
+                  new_replys.push({
+                    reply_content:result[i].reply_content,
+                    reply_userImg:result[i].reply_userImg,
+                    reply_to_userImg:result[i].reply_to_userImg,
+                    reply_name:result[i].reply_name,
+                    reply_to_name:result[i].reply_to_name
+                  })
+                  new_comments.push({
+                      comment_content:result[i].comment_content,
+                      comment_user:result[i].comment_name,
+                      comment_userImg:result[i].comment_userImg,
+                      replys:new_replys
+                  })
+                }
+              }
             }
             let new_result = {
                   author:result[0].author,
