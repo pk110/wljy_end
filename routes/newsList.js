@@ -21,30 +21,40 @@ router.post('/newsList_detail', async (ctx, next) => {
   }
   await userModel.newsList_detail(news_id.news_id)
     .then(result=>{
-        console.log(result)
         if (result.length){
             let time = new Date(result[0].time)
             time = time.getFullYear()+'-'+time.getMonth()+'-'+time.getDay()+' '+time.getHours()+':'+time.getMinutes()
             let new_comments = []
             for(let i = 0;i<result.length;i++){
-              let new_replys = []
-              for(let j = i;j<result.length;j++){
-                if(result[i].comment_id == result[j].reply_comment_id){
-                  new_replys.push({
-                    reply_content:result[i].reply_content,
-                    reply_userImg:result[i].reply_userImg,
-                    reply_to_userImg:result[i].reply_to_userImg,
-                    reply_name:result[i].reply_name,
-                    reply_to_name:result[i].reply_to_name
-                  })
-                  new_comments.push({
-                      comment_content:result[i].comment_content,
-                      comment_user:result[i].comment_name,
-                      comment_userImg:result[i].comment_userImg,
-                      replys:new_replys
-                  })
+                let new_replys = []
+                for(let j = i+1;j<result.length;j++){
+                    if(result[i].id == result[j].id){
+                        new_replys.push({
+                            re_name:result[i].re_name,
+                            re_userImg:result[i].re_userImg,
+                            re_content:result[i].re_content,
+                            re_to_name:result[i].re_to_name,
+                            re_to_userImg:result[i].re_to_userImg
+                        },{
+                            re_name:result[j].re_name,
+                            re_userImg:result[j].re_userImg,
+                            re_content:result[j].re_content,
+                            re_to_name:result[j].re_to_name,
+                            re_to_userImg:result[j].re_to_userImg
+                        })
+                    }
                 }
-              }
+                if(new_replys.length !== 0){
+                    let time = new Date(result[i].time)
+                    time = time.getMonth()+'-'+time.getDay()+' '+time.getHours()+':'+time.getMinutes()
+                    new_comments.push({
+                        comment_name:result[i].comment_name,
+                        comment_userImg:result[i].comment_userImg,
+                        comment_content:result[i].comment_content,
+                        time:time,
+                        new_replys:new_replys
+                    })
+                }
             }
             let new_result = {
                   author:result[0].author,

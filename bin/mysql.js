@@ -226,39 +226,32 @@ let newsListFour = function (  ) {
 
 //通过新闻页列表查询新闻页详情
 let newsList_detail = function ( news_id ) {
-  let _sql = `
-      SELECT 
-        n.author, 
-        n.image, 
-        n.title,
-        n.headImage,
-        n.time,
-        n.content,
-        c.content as 'comment_content',
-        u1.name as 'comment_name',
-        u3.name as 'reply_name',
-        u2.name as 'reply_to_name',
-        u1.userImg as 'comment_userImg',
-        u3.userImg as 'reply_userImg',
-        u2.userImg as 'reply_to_userImg',
-        r.content as 'reply_content',
-        c.id as 'comment_id',
-        r.comment_id as 'reply_comment_id'
-        FROM
-        tb_reply r
-        LEFT JOIN tb_newslist n ON n.news_id = "${news_id}"
-        LEFT JOIN tb_comment c ON (c.topic_id = n.news_id and c.id = r.comment_id and c.topic_type = n.topic_type)
-        LEFT JOIN tb_users u1 ON u1.id = c.user_id
-        LEFT JOIN tb_users u3 ON u3.id = r.user_id
-        LEFT JOIN tb_users u2 ON u2.id = r.to_id
-        `
-        // LEFT JOIN tb_comment c ON (c.topic_id = n.news_id and c.id = r.comment_id and c.topic_type = n.topic_type)
-        
-
-// select * from tb_newslist new left join tb_comment co on co.topic_id=new.news_id
-// left join tb_users us on us.id=co.user_id
-// left join tb_reply re on re.comment_id=co.id
-// where new.news_id=1
+  let _sql = 
+        `select 
+          new.author, 
+          new.image, 
+          new.title,
+          new.headImage,
+          new.time,
+          new.content,
+          co.id,
+          co.content as 'comment_content',
+          co.time,
+          us.name as 'comment_name',
+          us.userImg as 'comment_userImg',
+          re.content as 're_content',
+          u1.name as 're_name',
+          u1.userImg as 're_userImg',
+          u2.name as 're_to_name',
+          u2.userImg as 're_to_userImg'
+          from 
+          tb_newslist new left join tb_comment co on co.topic_id=new.news_id
+          left join tb_users us on us.id=co.user_id
+          left join tb_reply re on re.comment_id=co.id
+          left join tb_users u1 on u1.id=re.user_id
+          left join tb_users u2 on u2.id=re.to_id
+          where new.news_id=${news_id}
+          `
   return query( _sql)
 }
 
