@@ -16,10 +16,11 @@ router.post('/newsList', async (ctx, next) => {
 })
 
 router.post('/newsList_detail', async (ctx, next) => {  
-  var news_id={
-    news_id:ctx.request.body.news_id
+  var data={
+    news_id:ctx.request.body.news_id,
+    topic_type:ctx.request.body.topic_type
   }
-  await userModel.newsList_detail(news_id.news_id)
+  await userModel.newsList_detail(data)
     .then(result=>{
         if (result.length){
             let time = new Date(result[0].time)

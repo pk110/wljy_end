@@ -225,7 +225,7 @@ let newsListFour = function (  ) {
 
 
 //通过新闻页列表查询新闻页详情
-let newsList_detail = function ( news_id ) {
+let newsList_detail = function ( data ) {
   let _sql = 
         `select 
           new.author, 
@@ -250,7 +250,7 @@ let newsList_detail = function ( news_id ) {
           left join tb_reply re on re.comment_id=co.id
           left join tb_users u1 on u1.id=re.user_id
           left join tb_users u2 on u2.id=re.to_id
-          where new.news_id=${news_id}
+          where new.news_id=${data.news_id} and co.topic_type = ${data.topic_type}
           `
   return query( _sql)
 }
@@ -267,6 +267,37 @@ let vedioesListFour = function (  ) {
   let _sql = `
     SELECT * FROM tb_vedioeslist limit 0,4
       `
+  return query( _sql)
+}
+
+//通过视频页列表查询视频页详情
+let vedioesList_detail = function ( data ) {
+  let _sql = 
+        `select 
+          ve.author, 
+          ve.image, 
+          ve.title,
+          ve.headImg,
+          ve.time,
+          ve.vedioes,
+          co.id,
+          co.content as 'comment_content',
+          co.time,
+          us.name as 'comment_name',
+          us.userImg as 'comment_userImg',
+          re.content as 're_content',
+          u1.name as 're_name',
+          u1.userImg as 're_userImg',
+          u2.name as 're_to_name',
+          u2.userImg as 're_to_userImg'
+          from 
+          tb_vedioeslist ve left join tb_comment co on co.topic_id=ve.id
+          left join tb_users us on us.id=co.user_id
+          left join tb_reply re on re.comment_id=co.id
+          left join tb_users u1 on u1.id=re.user_id
+          left join tb_users u2 on u2.id=re.to_id
+          where ve.id=${data.vedioes_id} and co.topic_type = ${data.topic_type}
+          `
   return query( _sql)
 }
 
@@ -297,8 +328,9 @@ module.exports={
   notice,
   livesList,
   newsList,
-  vedioesList,
   newsList_detail,
+  vedioesList,
+  vedioesList_detail,
   livesListFour,
   newsListFour,
   vedioesListFour
