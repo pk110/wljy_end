@@ -16,6 +16,8 @@ router.post('/vedioesList', async (ctx, next) => {
 })
 
 router.post('/vedioesList_detail', async (ctx, next) => {
+  // 当没有评论的时候查询详情信息
+  let vedioesList_detail_top_result = await userModel.vedioesList_detail_top(ctx.request.body.vedioes_id)
   var data={
     vedioes_id:ctx.request.body.vedioes_id,
     topic_type:ctx.request.body.topic_type
@@ -48,6 +50,7 @@ router.post('/vedioesList_detail', async (ctx, next) => {
                         re_name:result[j].re_name,
                         re_userImg:result[j].re_userImg,
                         re_content:result[j].re_content,
+                        reply_user_id:result[i].reply_user_id,
                         re_to_name:result[j].re_to_name,
                         re_to_userImg:result[j].re_to_userImg
                     })
@@ -63,12 +66,15 @@ router.post('/vedioesList_detail', async (ctx, next) => {
                             re_name:result[i].re_name,
                             re_userImg:result[i].re_userImg,
                             re_content:result[i].re_content,
+                            reply_user_id:result[i].reply_user_id,
                             re_to_name:result[i].re_to_name,
                             re_to_userImg:result[i].re_to_userImg
                         })
                 }
                 new_comments.push({
                     comment_name:result[i].comment_name,
+                    comment_user_id:result[i].comment_user_id,
+                    comment_id:result[i].id,
                     comment_userImg:result[i].comment_userImg,
                     comment_content:result[i].comment_content,
                     time:time,
@@ -86,8 +92,22 @@ router.post('/vedioesList_detail', async (ctx, next) => {
                 comments:new_comments
             }
         ctx.body = util.backData(200,new_result,'成功')             
-      }else{
+      }else if(result.length == 0){
+        if(vedioesList_detail_top_result.length > 0){
+          let new_vedioesList_detail_top_result = {
+            author:vedioesList_detail_top_result[0].author,
+            headImg:vedioesList_detail_top_result[0].headImg,
+            image:vedioesList_detail_top_result[0].image,
+            title:vedioesList_detail_top_result[0].title,
+            vedioes:vedioesList_detail_top_result[0].vedioes,
+            vedioes_time:vedioesList_detail_top_result[0].vedioes_time
+          }
+          ctx.body = util.backData(200,new_vedioesList_detail_top_result,'成功')
+        }else{
           ctx.body = util.backData(400,null,'失败')
+        }
+      }else{
+        ctx.body = util.backData(400,null,'失败')
       }                         
   })
 })

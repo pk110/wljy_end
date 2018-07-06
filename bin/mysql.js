@@ -270,7 +270,7 @@ let vedioesListFour = function (  ) {
   return query( _sql)
 }
 
-//通过视频页列表查询视频页详情
+//通过视频页列表查询视频页详情包括评论
 let vedioesList_detail = function ( data ) {
   let _sql = 
         `select 
@@ -283,9 +283,11 @@ let vedioesList_detail = function ( data ) {
           co.id,
           co.content as 'comment_content',
           co.time as 'comment_time',
+					co.user_id as 'comment_user_id',
           us.name as 'comment_name',
           us.userImg as 'comment_userImg',
           re.content as 're_content',
+					re.user_id as 'reply_user_id',
           u1.name as 're_name',
           u1.userImg as 're_userImg',
           u2.name as 're_to_name',
@@ -301,7 +303,40 @@ let vedioesList_detail = function ( data ) {
   return query( _sql)
 }
 
+//通过视频页列表查询视频页详情
+let vedioesList_detail_top = function ( data ) {
+  let _sql = 
+        `select 
+          ve.author, 
+          ve.image, 
+          ve.title,
+          ve.headImg,
+          ve.time as 'vedioes_time',
+          ve.vedioes
+          from tb_vedioeslist as ve where ve.id=${data}
+          `
+  return query( _sql)
+}
 
+
+  //发表视频评论
+  let insertVedioesComment = function( value ) {
+    let _sql = "insert into tb_comment(topic_id,topic_type,content,user_id,time) values(?,?,?,?,?);"
+    return query( _sql, value )
+  }
+
+  //发表视频回复评论
+  let insertVedioesReply = function( value ) {
+    let _sql = "insert into tb_reply(comment_id,content,user_id,to_id) values(?,?,?,?);"
+    return query( _sql, value )
+  }
+
+  //检验是否有重复用户提交
+  let getCountByUserName = function(value) {
+    let _sql = 
+      `select * from tb_comment where topic_id = ${value.topic_id} and  topic_type= ${value.topic_type} and user_id = ${value.user_id}`
+    return query( _sql)
+  }
 
 
 module.exports={
@@ -331,7 +366,11 @@ module.exports={
   newsList_detail,
   vedioesList,
   vedioesList_detail,
+  vedioesList_detail_top,
+  insertVedioesComment,
+  insertVedioesReply,
   livesListFour,
   newsListFour,
-  vedioesListFour
+  vedioesListFour,
+  getCountByUserName
 }
