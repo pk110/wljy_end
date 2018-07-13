@@ -30,44 +30,44 @@ let query = function( sql, values ) {
 
 }
 
-users=
-`create table if not exists users(
- id INT NOT NULL AUTO_INCREMENT,
- name VARCHAR(100) NOT NULL,
- pass VARCHAR(40) NOT NULL,
- PRIMARY KEY ( id )
-);`
+// users=
+// `create table if not exists users(
+//  id INT NOT NULL AUTO_INCREMENT,
+//  name VARCHAR(100) NOT NULL,
+//  pass VARCHAR(40) NOT NULL,
+//  PRIMARY KEY ( id )
+// );`
 
-posts=
-`create table if not exists posts(
- id INT NOT NULL AUTO_INCREMENT,
- name VARCHAR(100) NOT NULL,
- title VARCHAR(40) NOT NULL,
- content  VARCHAR(40) NOT NULL,
- uid  VARCHAR(40) NOT NULL,
- moment  VARCHAR(40) NOT NULL,
- comments  VARCHAR(40) NOT NULL DEFAULT '0',
- pv  VARCHAR(40) NOT NULL DEFAULT '0',
- PRIMARY KEY ( id )
-);`
+// posts=
+// `create table if not exists posts(
+//  id INT NOT NULL AUTO_INCREMENT,
+//  name VARCHAR(100) NOT NULL,
+//  title VARCHAR(40) NOT NULL,
+//  content  VARCHAR(40) NOT NULL,
+//  uid  VARCHAR(40) NOT NULL,
+//  moment  VARCHAR(40) NOT NULL,
+//  comments  VARCHAR(40) NOT NULL DEFAULT '0',
+//  pv  VARCHAR(40) NOT NULL DEFAULT '0',
+//  PRIMARY KEY ( id )
+// );`
 
-comment=
-`create table if not exists comment(
- id INT NOT NULL AUTO_INCREMENT,
- name VARCHAR(100) NOT NULL,
- content VARCHAR(40) NOT NULL,
- postid VARCHAR(40) NOT NULL,
- PRIMARY KEY ( id )
-);`
+// comment=
+// `create table if not exists comment(
+//  id INT NOT NULL AUTO_INCREMENT,
+//  name VARCHAR(100) NOT NULL,
+//  content VARCHAR(40) NOT NULL,
+//  postid VARCHAR(40) NOT NULL,
+//  PRIMARY KEY ( id )
+// );`
 
 let createTable = function( sql ) {
   return query( sql, [] )
 }
 
 // 建表
-createTable(users)
-createTable(posts)
-createTable(comment)
+// createTable(users)
+// createTable(posts)
+// createTable(comment)
 
 // 注册用户
 let insertData = function( value ) {
@@ -233,13 +233,16 @@ let newsList_detail = function ( data ) {
           new.title,
           new.headImage,
           new.time,
+          new.news_id,
           new.content,
           co.id,
           co.content as 'comment_content',
           co.time,
+          co.user_id as 'comment_user_id',
           us.name as 'comment_name',
           us.userImg as 'comment_userImg',
           re.content as 're_content',
+					re.user_id as 'reply_user_id',
           u1.name as 're_name',
           u1.userImg as 're_userImg',
           u2.name as 're_to_name',
@@ -252,6 +255,42 @@ let newsList_detail = function ( data ) {
           left join tb_users u2 on u2.id=re.to_id
           where new.news_id=${data.news_id} and co.topic_type = ${data.topic_type}
           `
+  return query( _sql)
+}
+
+//通过新闻页列表查询新闻页详情
+let newsList_detail_top = function ( data ) {
+  console.log(data)
+  let _sql = 
+        `select 
+          ne.author, 
+          ne.image, 
+          ne.title,
+          ne.headImage,
+          ne.time,
+          ne.news_id,
+          ne.content
+          from tb_newslist as ne where ne.news_id=${data}
+          `
+  return query( _sql)
+}
+
+//发表新闻评论
+let insertNewsComment = function( value ) {
+  let _sql = "insert into tb_comment(topic_id,topic_type,content,user_id,time) values(?,?,?,?,?);"
+  return query( _sql, value )
+}
+
+//发表新闻回复评论
+let insertNewsReply = function( value ) {
+  let _sql = "insert into tb_reply(comment_id,content,user_id,to_id) values(?,?,?,?);"
+  return query( _sql, value )
+}
+
+//检验新闻详情页是否有重复用户提交
+let getCountByUserNameNews = function(value) {
+  let _sql = 
+    `select * from tb_comment where topic_id = ${value.topic_id} and  topic_type= ${value.topic_type} and user_id = ${value.user_id}`
   return query( _sql)
 }
 
@@ -280,6 +319,7 @@ let vedioesList_detail = function ( data ) {
           ve.headImg,
           ve.time as 'vedioes_time',
           ve.vedioes,
+          ve.id as 'vedioes_id',
           co.id,
           co.content as 'comment_content',
           co.time as 'comment_time',
@@ -312,32 +352,50 @@ let vedioesList_detail_top = function ( data ) {
           ve.title,
           ve.headImg,
           ve.time as 'vedioes_time',
-          ve.vedioes
+          ve.vedioes,
+          ve.id as 'vedioes_id'
           from tb_vedioeslist as ve where ve.id=${data}
           `
   return query( _sql)
 }
 
 
-  //发表视频评论
-  let insertVedioesComment = function( value ) {
-    let _sql = "insert into tb_comment(topic_id,topic_type,content,user_id,time) values(?,?,?,?,?);"
-    return query( _sql, value )
-  }
+//发表视频评论
+let insertVedioesComment = function( value ) {
+  let _sql = "insert into tb_comment(topic_id,topic_type,content,user_id,time) values(?,?,?,?,?);"
+  return query( _sql, value )
+}
 
-  //发表视频回复评论
-  let insertVedioesReply = function( value ) {
-    let _sql = "insert into tb_reply(comment_id,content,user_id,to_id) values(?,?,?,?);"
-    return query( _sql, value )
-  }
+//发表视频回复评论
+let insertVedioesReply = function( value ) {
+  let _sql = "insert into tb_reply(comment_id,content,user_id,to_id) values(?,?,?,?);"
+  return query( _sql, value )
+}
 
-  //检验是否有重复用户提交
-  let getCountByUserName = function(value) {
-    let _sql = 
-      `select * from tb_comment where topic_id = ${value.topic_id} and  topic_type= ${value.topic_type} and user_id = ${value.user_id}`
-    return query( _sql)
-  }
+//检验视频详情页是否有重复用户提交
+let getCountByUserName = function(value) {
+  let _sql = 
+    `select * from tb_comment where topic_id = ${value.topic_id} and  topic_type= ${value.topic_type} and user_id = ${value.user_id}`
+  return query( _sql)
+}
 
+//用户关注新闻、视频
+let attention = function(value){
+  let _sql = `select * from tb_userAttention where topic_type=${value.topic_type} and to_id=${value.vedioes_id || value.news_id} and user_id=${value.user_id}`
+  return query(_sql)
+}
+
+//插入数据库关注
+let insertAttention = function(value){
+  let _sql = `insert into tb_userattention(user_id,to_id,topic_type) values(?,?,?);`
+  return query( _sql, value )
+}
+
+//删掉插入的数据库关注
+let cancelVedioesAttention = function(value){
+  let _sql = `delete from tb_userattention where user_id = ${value.user_id} and to_id = ${value.to_id} and topic_type=${value.topic_type}` 
+  return query(_sql)
+}
 
 module.exports={
   query,
@@ -361,16 +419,28 @@ module.exports={
   registerUser,
   loginUser,
   notice,
+  //直播
   livesList,
+  livesListFour,
+  //新闻
   newsList,
   newsList_detail,
+  newsListFour,
+  newsList_detail_top,
+  getCountByUserNameNews,
+  insertNewsComment,
+  insertNewsReply,
+  //视频
   vedioesList,
   vedioesList_detail,
+  getCountByUserName,
   vedioesList_detail_top,
   insertVedioesComment,
   insertVedioesReply,
-  livesListFour,
-  newsListFour,
   vedioesListFour,
-  getCountByUserName
+  //用户关注新闻或者文章
+  attention,
+  //插入数据库关注
+  insertAttention,
+  cancelVedioesAttention
 }

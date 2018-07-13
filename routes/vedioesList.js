@@ -16,17 +16,24 @@ router.post('/vedioesList', async (ctx, next) => {
 })
 
 router.post('/vedioesList_detail', async (ctx, next) => {
-  // 当没有评论的时候查询详情信息
-  let vedioesList_detail_top_result = await userModel.vedioesList_detail_top(ctx.request.body.vedioes_id)
   var data={
+    user_id:ctx.request.body.user_id,
     vedioes_id:ctx.request.body.vedioes_id,
     topic_type:ctx.request.body.topic_type
+  }
+  // 当没有评论的时候查询详情信息
+  let vedioesList_detail_top_result = await userModel.vedioesList_detail_top(ctx.request.body.vedioes_id)
+  //查询该用户是否关注了该视频
+  let status = 0
+  let attention = await userModel.attention(data)
+  if(attention.length == 1){
+    status = 1
   }
   await userModel.vedioesList_detail(data)
   .then(result=>{
       if (result.length){ 
         let time = new Date(result[0].vedioes_time)
-        time = time.getFullYear()+'-'+time.getMonth()+'-'+time.getDay()+' '+time.getHours()+':'+time.getMinutes()
+        time = util.timePrefix(time.getFullYear())+'-'+util.timePrefix(time.getMonth())+'-'+util.timePrefix(time.getDay())+' '+util.timePrefix(time.getHours())+':'+util.timePrefix(time.getMinutes())
         let new_comments = []
         let catchAgain = []
         for(let i = 0;i<result.length;i++){
@@ -59,7 +66,7 @@ router.post('/vedioesList_detail', async (ctx, next) => {
             //说明第一条评论是有人评论的
             if(isBreak == true){
                 let time = new Date(result[i].comment_time)
-                time = time.getMonth()+'-'+time.getDay()+' '+time.getHours()+':'+time.getMinutes()
+                time = util.timePrefix(time.getMonth())+'-'+util.timePrefix(time.getDay())+' '+util.timePrefix(time.getHours())+':'+util.timePrefix(time.getMinutes())
                 //把第一条人的回复放在里面
                 if(result[i].re_name !== null){
                     new_replys.push({
@@ -88,6 +95,8 @@ router.post('/vedioesList_detail', async (ctx, next) => {
                 headImage:result[0].headImg,
                 image:result[0].image,
                 time:time,
+                status:status,
+                id:result[0].vedioes_id,
                 title:result[0].title,
                 comments:new_comments
             }
@@ -100,7 +109,9 @@ router.post('/vedioesList_detail', async (ctx, next) => {
             image:vedioesList_detail_top_result[0].image,
             title:vedioesList_detail_top_result[0].title,
             vedioes:vedioesList_detail_top_result[0].vedioes,
-            vedioes_time:vedioesList_detail_top_result[0].vedioes_time
+            vedioes_time:vedioesList_detail_top_result[0].vedioes_time,
+            id:vedioesList_detail_top_result[0].vedioes_id,
+            status:status
           }
           ctx.body = util.backData(200,new_vedioesList_detail_top_result,'成功')
         }else{
@@ -112,5 +123,36 @@ router.post('/vedioesList_detail', async (ctx, next) => {
   })
 })
 
+router.post('/vedioesAttention', async (ctx, next) => {
+  const data = [
+    ctx.request.body.user_id,
+    ctx.request.body.to_id,
+    ctx.request.body.topic_type
+  ]
+  await userModel.insertAttention(data)
+    .then(result=>{
+        if (result.affectedRows == 1){ 
+            ctx.body = util.backData(200,result,'成功')           
+        }else{
+            ctx.body = util.backData(400,null,'失败')
+        }                         
+    })
+})
+
+router.post('/cancelVedioesAttention', async (ctx, next) => {
+  const data = {
+    user_id:ctx.request.body.user_id,
+    to_id:ctx.request.body.to_id,
+    topic_type:ctx.request.body.topic_type
+  }
+  await userModel.cancelVedioesAttention(data)
+    .then(result=>{
+        if (result.affectedRows == 1){ 
+            ctx.body = util.backData(200,result,'成功')           
+        }else{
+            ctx.body = util.backData(400,null,'失败')
+        }                         
+    })
+})
 
 module.exports = router

@@ -11,6 +11,11 @@ let backData = (code,data,message) =>{
   }
 }
 
+// 判断时间前面是否需要加0
+let timePrefix = (v) => {
+  return (v > 9 ? v : '0' + v)
+}
+
 //将当前时间转换成标准格式
 let formateTime = (date) => {  
   var y = date.getFullYear();  
@@ -67,6 +72,7 @@ module.exports = {
   backData,
   formateTimes,
   formateTime,
-  formatDateTime
+  formatDateTime,
+  timePrefix
 }
 
