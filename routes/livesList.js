@@ -4,7 +4,7 @@ var userModel = require('../bin/mysql.js');
 //工具类
 var util = require('../utils/utils')
 
-router.post('/livesList', async (ctx, next) => {
+router.post(util.front() + '/livesList', async (ctx, next) => {
   await userModel.livesList()
     .then(result=>{
         if (result.length){ 

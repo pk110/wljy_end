@@ -397,6 +397,39 @@ let cancelVedioesAttention = function(value){
   return query(_sql)
 }
 
+//我的收藏视频
+let myCollectionVedioes = function(value){
+  const start = (value.currentPage - 1) * 10;
+  let _sql = `select 
+          ve.author, 
+          ve.image, 
+          ve.title,
+          ve.time,
+          ve.id,
+          2 as topic_type
+          from 
+          tb_userattention ua left join tb_vedioeslist ve on ua.to_id = ve.id
+          where ua.user_id=${value.user_id} and ua.topic_type = 2
+          limit ${start},10`
+  return query(_sql)
+}
+
+//我的收藏新闻
+let myCollectionNews = function(value){
+  const start = (value.currentPage - 1) * 10;
+  let _sql = `select 
+          ne.author, 
+          ne.image, 
+          ne.title,
+          ne.time,
+          ne.news_id,
+          3 as topic_type
+          from 
+          tb_userattention ua left join tb_newslist ne on ua.to_id = ne.news_id
+          where ua.user_id=${value.user_id} and ua.topic_type = 3
+          limit ${start},10`
+  return query(_sql)
+}
 module.exports={
   query,
   createTable,
@@ -442,5 +475,8 @@ module.exports={
   attention,
   //插入数据库关注
   insertAttention,
-  cancelVedioesAttention
+  cancelVedioesAttention,
+  //我的模块
+  myCollectionVedioes,
+  myCollectionNews
 }

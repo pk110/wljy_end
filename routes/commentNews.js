@@ -4,7 +4,7 @@ var userModel = require('../bin/mysql.js');
 //工具类
 var util = require('../utils/utils')
 
-router.post('/newsComment', async (ctx, next) => {
+router.post(util.front() + '/newsComment', async (ctx, next) => {
   const args = {
     topic_id:ctx.request.body.topic_id,
     topic_type:2,
@@ -37,7 +37,7 @@ router.post('/newsComment', async (ctx, next) => {
     }
 })
 
-router.post('/newsReply', async (ctx, next) => {
+router.post(util.front() + '/newsReply', async (ctx, next) => {
   const data = [
     ctx.request.body.comment_id,
     ctx.request.body.content,

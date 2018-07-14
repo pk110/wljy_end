@@ -2,6 +2,16 @@
  *工具类
  */
 
+//前端API
+let front = () =>{
+  return '/front/api'
+}
+
+//后端API
+let manager = () =>{
+  return '/manager/api'
+}
+
 // 接口返回数据
 let backData = (code,data,message) =>{
   return {
@@ -69,6 +79,8 @@ let formateTimes = (time1) => {
 }
 
 module.exports = {
+  front,
+  manager,
   backData,
   formateTimes,
   formateTime,

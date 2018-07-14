@@ -4,7 +4,7 @@ var userModel = require('../bin/mysql.js');
 //工具类
 var util = require('../utils/utils')
 
-router.post('/vedioesList', async (ctx, next) => {
+router.post(util.front() + '/vedioesList', async (ctx, next) => {
   await userModel.vedioesList()
     .then(result=>{
         if (result.length){ 
@@ -15,7 +15,7 @@ router.post('/vedioesList', async (ctx, next) => {
     })
 })
 
-router.post('/vedioesList_detail', async (ctx, next) => {
+router.post(util.front() + '/vedioesList_detail', async (ctx, next) => {
   var data={
     user_id:ctx.request.body.user_id,
     vedioes_id:ctx.request.body.vedioes_id,
@@ -123,7 +123,7 @@ router.post('/vedioesList_detail', async (ctx, next) => {
   })
 })
 
-router.post('/vedioesAttention', async (ctx, next) => {
+router.post(util.front() + '/vedioesAttention', async (ctx, next) => {
   const data = [
     ctx.request.body.user_id,
     ctx.request.body.to_id,
@@ -139,7 +139,7 @@ router.post('/vedioesAttention', async (ctx, next) => {
     })
 })
 
-router.post('/cancelVedioesAttention', async (ctx, next) => {
+router.post(util.front() + '/cancelVedioesAttention', async (ctx, next) => {
   const data = {
     user_id:ctx.request.body.user_id,
     to_id:ctx.request.body.to_id,

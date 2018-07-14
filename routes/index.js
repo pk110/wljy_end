@@ -4,7 +4,7 @@ var userModel = require('../bin/mysql.js');
 //工具类
 var util = require('../utils/utils')
 
-router.post('/notice', async (ctx, next) => {
+router.post(util.front() + '/notice', async (ctx, next) => {
     const title = {
         title:ctx.request.body.title
     }
@@ -18,7 +18,7 @@ router.post('/notice', async (ctx, next) => {
     })
 })
 
-router.post('/livesListFour', async (ctx, next) => {
+router.post(util.front() + '/livesListFour', async (ctx, next) => {
   await userModel.livesListFour()
     .then(result=>{
         if (result.length){ 
@@ -29,7 +29,7 @@ router.post('/livesListFour', async (ctx, next) => {
     })
 })
 
-router.post('/newsListFour', async (ctx, next) => {
+router.post(util.front() + '/newsListFour', async (ctx, next) => {
   await userModel.newsListFour()
     .then(result=>{
         if (result.length){ 
@@ -41,7 +41,7 @@ router.post('/newsListFour', async (ctx, next) => {
 })
 
 
-router.post('/vedioesListFour', async (ctx, next) => {
+router.post(util.front() + '/vedioesListFour', async (ctx, next) => {
   await userModel.vedioesListFour()
     .then(result=>{
         if (result.length){ 

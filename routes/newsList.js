@@ -4,7 +4,7 @@ var userModel = require('../bin/mysql.js');
 //工具类
 var util = require('../utils/utils')
 
-router.post('/newsList', async (ctx, next) => {
+router.post(util.front() + '/newsList', async (ctx, next) => {
   await userModel.newsList()
     .then(result=>{
         if (result.length){ 
@@ -15,7 +15,7 @@ router.post('/newsList', async (ctx, next) => {
     })
 })
 
-router.post('/newsList_detail', async (ctx, next) => { 
+router.post(util.front() + '/newsList_detail', async (ctx, next) => { 
   var data={
     user_id:ctx.request.body.user_id,
     news_id:ctx.request.body.news_id,
