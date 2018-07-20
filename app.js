@@ -5,12 +5,13 @@ const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
+// 获取中间件
+var middleware = require('./middleware/mid')
 // CORS是一个W3C标准，全称是"跨域资源共享"（Cross-origin resource sharing）。
 // 下面以koa2-cors为例，
 const cors = require('koa2-cors');
 
 const login = require('./routes/login')
-const users = require('./routes/register')
 const index = require('./routes/index')
 const livesList = require('./routes/livesList')
 const newsList = require('./routes/newsList')
@@ -49,18 +50,11 @@ app.use(cors({
     allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
 }))
 
-
-// logger
-app.use(async (ctx, next) => {
-  const start = new Date()
-  await next()
-  const ms = new Date() - start
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
-})
+// 接口响应时间
+app.use(middleware.loggerAsync())
 
 // routes
 app.use(login.routes(), login.allowedMethods())
-app.use(users.routes(), users.allowedMethods())
 app.use(index.routes(), index.allowedMethods())
 app.use(livesList.routes(), livesList.allowedMethods())
 app.use(newsList.routes(), newsList.allowedMethods())

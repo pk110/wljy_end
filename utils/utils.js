@@ -78,6 +78,105 @@ let formateTimes = (time1) => {
   return date.getTime();  
 }
 
+//外部接口的转接
+/** 
+ * @param key {int} APPId
+ * @param start {string} 
+ * @param end {string} 
+*/
+var fs = require('fs');
+var http = require('http');
+var qs = require('querystring');
+let outsideIde = (key,start,end) =>{
+  return (cb) => {
+    var data = {
+        key:key,
+        start:start,
+        end:end
+    };
+
+    /*请求MobAPI里的火车票查询接口*/
+    var content = qs.stringify(data);
+    var http_request = {
+        hostname:'apicloud.mob.com',
+        port:80,
+        path:'/train/tickets/queryByStationToStation?' + content,
+        method: 'GET'
+    };
+
+    var req = http.request(http_request,function(response){
+        var body = '';
+        response.setEncoding('utf-8');
+        response.on('data',function(chunk){
+            body += chunk;
+        });
+        response.on('end',function(){
+            cb(null,body);
+        });
+    });
+
+    req.end();
+  }
+}
+
+//内部接口的转接
+// 参考地址 http://nodejs.cn/api/http.html#http_http_request_options_callback
+/** 
+ * @param dataObj {int} 传递的JSON对象
+ * @param urlRoot {string} 请求根地址
+ * @param path {string} 请求地址
+ * @param method {string} 请求方式 GET POST
+*/
+
+let insideIde = (dataObj,urlRoot,path,method) =>{
+    /*请求自己内部的接口*/
+  let data = new Promise((resolve, reject) => {
+    var content = qs.stringify(dataObj);
+    var http_request = {
+        hostname:urlRoot,
+        port:3000,
+        path:path,
+        method: method,
+        headers: {
+            "content-type": 'application/x-www-form-urlencoded',
+            'Content-Length': Buffer.byteLength(content)
+        }
+    };
+
+    var req = http.request(http_request,function(response){
+        console.log(`状态码: ${response.statusCode}`);
+        console.log(`响应头: ${JSON.stringify(response.headers)}`);
+        var body = '';
+        response.setEncoding('utf-8');
+        response.on('data',(chunk) => {
+          console.log(`响应主体: ${chunk}`);
+          resolve(chunk)
+        });
+        response.on('end',() =>{
+          console.log('响应中已无数据。');
+        });
+    });
+    req.on('error', (e) => {
+      console.error(`请求遇到问题: ${e.message}`);
+    });
+    
+    // 写入数据到请求主体
+    req.write(content);
+    req.end();
+  })
+  return data
+}
+
+// 在其他接口里调用
+// const data = {
+//   'user_id':1,
+//   'to_id':2,
+//   'topic_type':3
+// }
+// util.insideIde(data,'192.168.11.106','/front/api/vedioesAttention','POST').then((date)=>{
+//   console.log(date)
+// })
+
 module.exports = {
   front,
   manager,
@@ -85,6 +184,8 @@ module.exports = {
   formateTimes,
   formateTime,
   formatDateTime,
-  timePrefix
+  timePrefix,
+  insideIde,
+  outsideIde
 }
 

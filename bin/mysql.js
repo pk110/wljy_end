@@ -168,17 +168,34 @@ let findCommentLength = function(id){
 
 // 注册用户表
 let registerUser = function( value ) {
-  let _sql = `insert into tb_users(name,password) values(?,?);`
+  let _sql = `insert into tb_users(name,sex,userImg) values(?,?,?);`
   return query( _sql, value )
 }
 
-// 用户登录表
-let loginUser = function (  name ) {
+// 用户绑定手机号到用户表
+let bindPhone = function (  value ) {
   let _sql = `
-    SELECT * from tb_users
-      where name="${name}"
+      update tb_users set  phone=${value.phone} where id=${value.id}
       `
   return query( _sql)
+}
+
+//根据id查询当前用户是否在用户列表中
+let IsIdUser = function(value){
+  let _sql = `
+    SELECT * from tb_users
+      where id="${value}"
+      `
+  return query(_sql)
+}
+
+//根据名字查询当前用户是否在用户列表中
+let IsNameUser = function(value){
+  let _sql = `
+    SELECT * from tb_users
+      where name="${value}"
+      `
+  return query(_sql)
 }
 
 
@@ -260,7 +277,6 @@ let newsList_detail = function ( data ) {
 
 //通过新闻页列表查询新闻页详情
 let newsList_detail_top = function ( data ) {
-  console.log(data)
   let _sql = 
         `select 
           ne.author, 
@@ -450,7 +466,9 @@ module.exports={
   updatePostPv,
   // 新增
   registerUser,
-  loginUser,
+  bindPhone,
+  IsIdUser,
+  IsNameUser,
   notice,
   //直播
   livesList,
