@@ -14,20 +14,27 @@ router.post(util.front() + '/register', async (ctx, next) => {
   let userResult = await userModel.IsNameUser(ctx.request.body.name)
   if(userResult.length){
     //查看对应的用户有没有phone
-    if(userResult.phone !== null){  //1表示绑定了 0 表示没有绑定
-      ctx.body = util.backData(200,{status:1},'用户已经绑定了') 
+    if(userResult[0].phone !== null){  //1表示绑定了 0 表示没有绑定
+      ctx.body = util.backData(200,{status:1,user_id:userResult[0].id},'用户已经绑定了') 
     }else{
-      ctx.body = util.backData(200,{status:0},'用户没有被绑定') 
+      ctx.body = util.backData(200,{status:0,user_id:userResult[0].id},'用户没有被绑定') 
     }
   }else{
-    await userModel.registerUser(userMessage)
-      .then(result=>{
-          if (result.affectedRows == 1){ 
-              ctx.body = util.backData(200,result,'入库成功')           
+    let userAgainResult = await userModel.registerUser(userMessage)
+    if (userAgainResult.affectedRows == 1){ 
+      //入库以后我还需要找到用户对应的id
+      await userModel.IsNameUser(ctx.request.body.name)
+        .then(result=>{
+          //查看对应的用户有没有phone
+          if(result[0].phone !== null){  //1表示绑定了 0 表示没有绑定
+            ctx.body = util.backData(200,{status:1,user_id:result[0].id},'用户已经绑定了') 
           }else{
-              ctx.body = util.backData(400,null,'入库失败')
-          }                         
-    })
+            ctx.body = util.backData(200,{status:0,user_id:result[0].id},'用户没有被绑定') 
+          }                        
+      })
+    }else{
+        ctx.body = util.backData(400,null,'入库失败')
+    }
   }
 })
 
