@@ -19,6 +19,7 @@ const vedioesList = require('./routes/vedioesList')
 const commentVedioes = require('./routes/commentVedioes')
 const commentNews = require('./routes/commentNews')
 const my = require('./routes/my')
+const order = require('./routes/order')
 
 // error handler
 onerror(app)
@@ -62,6 +63,7 @@ app.use(vedioesList.routes(), vedioesList.allowedMethods())
 app.use(commentVedioes.routes(), commentVedioes.allowedMethods())
 app.use(commentNews.routes(), commentNews.allowedMethods())
 app.use(my.routes(), my.allowedMethods())
+app.use(order.routes(), order.allowedMethods())
 
 // error-handling
 app.on('error', (err, ctx) => {

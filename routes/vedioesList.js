@@ -123,6 +123,7 @@ router.post(util.front() + '/vedioesList_detail', async (ctx, next) => {
   })
 })
 
+//关注
 router.post(util.front() + '/vedioesAttention', async (ctx, next) => {
   const data = [
     ctx.request.body.user_id,
@@ -130,6 +131,22 @@ router.post(util.front() + '/vedioesAttention', async (ctx, next) => {
     ctx.request.body.topic_type
   ]
   await userModel.insertAttention(data)
+    .then(result=>{
+        if (result.affectedRows == 1){ 
+            ctx.body = util.backData(200,result,'成功')           
+        }else{
+            ctx.body = util.backData(400,null,'失败')
+        }                         
+    })
+})
+//添加购物车
+router.post(util.front() + '/addCarts', async (ctx, next) => {
+  const data = [
+    ctx.request.body.user_id,
+    ctx.request.body.to_id,
+    ctx.request.body.topic_type
+  ]
+  await userModel.insertCarts(data)
     .then(result=>{
         if (result.affectedRows == 1){ 
             ctx.body = util.backData(200,result,'成功')           

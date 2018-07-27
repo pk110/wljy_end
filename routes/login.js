@@ -61,4 +61,16 @@ router.post(util.front() + '/bindphone', async (ctx, next) => {
   }
 })
 
+//获取用户购物车数量
+router.post(util.front() + '/getCartsNumber', async (ctx, next) => {
+  await userModel.getCartsNumber(ctx.request.body.user_id)
+    .then(result=>{
+        if (result.length){ 
+            ctx.body = util.backData(200,{cartsNumber:result.length},'成功')           
+        }else{
+            ctx.body = util.backData(400,{cartsNumber:0},'购物车数量为0')
+        }                         
+    })
+})
+
 module.exports = router

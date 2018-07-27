@@ -407,6 +407,19 @@ let insertAttention = function(value){
   return query( _sql, value )
 }
 
+//用户加入购物车
+let insertCarts = function(value){
+  let _sql = `insert into tb_carts(user_id,to_id,topic_type) values(?,?,?);`
+  return query( _sql, value )
+}
+
+//获取用户购物车数量
+let getCartsNumber = function(value){
+  let _sql = 
+    `select * from tb_carts where user_id = ${value}`
+  return query( _sql)
+}
+
 //删掉插入的数据库关注
 let cancelVedioesAttention = function(value){
   let _sql = `delete from tb_userattention where user_id = ${value.user_id} and to_id = ${value.to_id} and topic_type=${value.topic_type}` 
@@ -446,6 +459,23 @@ let myCollectionNews = function(value){
           limit ${start},10`
   return query(_sql)
 }
+
+//我的购物车列表分页
+let myCartsList = function(value){
+  const start = (value.currentPage - 1) * 10;
+  let _sql = `select * from tb_carts where user_id = ${value.user_id} limit ${start},10`
+  return query(_sql)
+}
+
+//通过勾选购物车列表获取订单信息
+let getOrderDetail = function(data){
+  let _sql = 
+        `select *
+          from tb_vedioeslist as ve where ve.id=${data}
+          `
+  return query( _sql)
+}
+
 module.exports={
   query,
   createTable,
@@ -485,7 +515,7 @@ module.exports={
   vedioesList,
   vedioesList_detail,
   getCountByUserName,
-  vedioesList_detail_top,
+  vedioesList_detail_top, 
   insertVedioesComment,
   insertVedioesReply,
   vedioesListFour,
@@ -496,5 +526,13 @@ module.exports={
   cancelVedioesAttention,
   //我的模块
   myCollectionVedioes,
-  myCollectionNews
+  myCollectionNews,
+  //添加至购物车
+  insertCarts,
+  //获取用户购物车数量
+  getCartsNumber,
+  //我的购物车列表
+  myCartsList,
+  //通过勾选购物车列表获取订单信息
+  getOrderDetail
 }

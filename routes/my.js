@@ -50,5 +50,25 @@ router.post(util.front() + '/myCollection', async (ctx, next) => {
     })
 })
 
+//获取购物车列表
+router.post(util.front() + '/myCarts', async (ctx, next) => {
+  const data = {
+    user_id:ctx.request.body.user_id,
+    currentPage:ctx.request.body.currentPage
+  }
+  // 获得用户加入了什么商品到购物车里去了
+  let myCollectionVedioes = await userModel.myCartsList(data)
+  let newResult = []
+  for(let i =0;i<myCollectionVedioes.length;i++){
+    await userModel.vedioesList_detail_top(myCollectionVedioes[i].to_id)
+      .then(result =>{
+          if(result.length){
+            newResult.push(result[0])
+          }
+      })
+  } 
+  ctx.body = util.backData(200,newResult,'成功')
+})
+
 
 module.exports = router
