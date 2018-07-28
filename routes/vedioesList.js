@@ -29,6 +29,12 @@ router.post(util.front() + '/vedioesList_detail', async (ctx, next) => {
   if(attention.length == 1){
     status = 1
   }
+  //查询当前用户是否购买了这个视频 0是不可看 1是可以看
+  let isBuy = 0
+  let buy = await userModel.userBuy(data)
+  if(buy.length == 1){
+      isBuy = 1
+  }
   await userModel.vedioesList_detail(data)
   .then(result=>{
       if (result.length){ 
@@ -95,7 +101,9 @@ router.post(util.front() + '/vedioesList_detail', async (ctx, next) => {
                 headImage:result[0].headImg,
                 image:result[0].image,
                 time:time,
+                money:result[0].money,
                 status:status,
+                isBuy:isBuy,
                 id:result[0].vedioes_id,
                 title:result[0].title,
                 comments:new_comments
@@ -111,6 +119,8 @@ router.post(util.front() + '/vedioesList_detail', async (ctx, next) => {
             vedioes:vedioesList_detail_top_result[0].vedioes,
             vedioes_time:vedioesList_detail_top_result[0].vedioes_time,
             id:vedioesList_detail_top_result[0].vedioes_id,
+            money:vedioesList_detail_top_result[0].money,
+            isBuy:isBuy,
             status:status
           }
           ctx.body = util.backData(200,new_vedioesList_detail_top_result,'成功')
@@ -141,19 +151,29 @@ router.post(util.front() + '/vedioesAttention', async (ctx, next) => {
 })
 //添加购物车
 router.post(util.front() + '/addCarts', async (ctx, next) => {
-  const data = [
-    ctx.request.body.user_id,
-    ctx.request.body.to_id,
-    ctx.request.body.topic_type
-  ]
-  await userModel.insertCarts(data)
-    .then(result=>{
-        if (result.affectedRows == 1){ 
-            ctx.body = util.backData(200,result,'成功')           
-        }else{
-            ctx.body = util.backData(400,null,'失败')
-        }                         
-    })
+  const findData = {
+      user_id: ctx.request.body.user_id,
+      to_id:ctx.request.body.to_id,
+      topic_type:ctx.request.body.topic_type
+  }
+  let findResult = await userModel.findCarts(findData)
+  if(findResult.length == 1){
+    ctx.body = util.backData(201,findResult,'已经添加到购物车了') 
+  }else{
+    const data = [
+        ctx.request.body.user_id,
+        ctx.request.body.to_id,
+        ctx.request.body.topic_type
+    ]
+    await userModel.insertCarts(data)
+        .then(result=>{
+            if (result.affectedRows == 1){ 
+                ctx.body = util.backData(200,result,'成功')           
+            }else{
+                ctx.body = util.backData(400,null,'失败')
+            }                         
+        })
+  }
 })
 
 router.post(util.front() + '/cancelVedioesAttention', async (ctx, next) => {

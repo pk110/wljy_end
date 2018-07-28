@@ -335,6 +335,7 @@ let vedioesList_detail = function ( data ) {
           ve.headImg,
           ve.time as 'vedioes_time',
           ve.vedioes,
+          ve.money,
           ve.id as 'vedioes_id',
           co.id,
           co.content as 'comment_content',
@@ -395,6 +396,12 @@ let getCountByUserName = function(value) {
   return query( _sql)
 }
 
+//检查用户是否购买了当前的视频
+let userBuy = function(value){
+  let _sql = `select * from tb_userBuy where topic_type=${value.topic_type} and to_id=${value.vedioes_id || value.news_id} and user_id=${value.user_id}`
+  return query(_sql)
+}
+
 //用户关注新闻、视频
 let attention = function(value){
   let _sql = `select * from tb_userAttention where topic_type=${value.topic_type} and to_id=${value.vedioes_id || value.news_id} and user_id=${value.user_id}`
@@ -405,6 +412,12 @@ let attention = function(value){
 let insertAttention = function(value){
   let _sql = `insert into tb_userattention(user_id,to_id,topic_type) values(?,?,?);`
   return query( _sql, value )
+}
+
+//查找购物车同一个账户是否有相同商品
+let findCarts = function(value){
+  let _sql = `select * from tb_carts where topic_type=${value.topic_type} and to_id=${value.to_id} and user_id=${value.user_id}`
+  return query(_sql)
 }
 
 //用户加入购物车
@@ -529,10 +542,14 @@ module.exports={
   myCollectionNews,
   //添加至购物车
   insertCarts,
+  //查找购物车同一个账户是否有相同商品
+  findCarts,
   //获取用户购物车数量
   getCartsNumber,
   //我的购物车列表
   myCartsList,
   //通过勾选购物车列表获取订单信息
-  getOrderDetail
+  getOrderDetail,
+  //检查用户是否购买了当前的视频
+  userBuy
 }
